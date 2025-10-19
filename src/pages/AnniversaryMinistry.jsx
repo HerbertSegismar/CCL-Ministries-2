@@ -1,9 +1,39 @@
-import logo from '../assets/CityCrossLogoBlue.svg'
+import { useState } from "react";
+import logo from "../assets/CityCrossLogoBlue.svg";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
-const About = () => {
+const Anniversary = () => {
+  const [result, setResult] = useState("");
+
+  const onSubmit = async (event) => {
+    event.preventDefault();
+    setResult("SUBMITTING....");
+    const formData = new FormData(event.target);
+
+    formData.append("access_key", "59475ece-6e80-4fa3-befc-34da8970f8ed");
+
+    const response = await fetch("https://api.web3forms.com/submit", {
+      method: "POST",
+      body: formData,
+    });
+
+    const data = await response.json();
+
+    if (data.success) {
+      setResult("");
+      toast.success("Registration Submitted Successfully");
+      event.target.reset();
+    } else {
+      console.log("Error", data);
+      toast.error(data.message);
+      setResult("");
+    }
+  };
   return (
     <div class="container2">
-      <form action="https://api.web3forms.com/submit" method="POST">
+      <ToastContainer />
+      <form onSubmit={onSubmit}>
         <img class="logo" src={logo} alt="" />
         <h4>
           WELCOMES YOU TO OUR <br /> <em class="seventh">8th</em> YEAR
@@ -27,10 +57,10 @@ const About = () => {
           id="email"
           name="email"
         /> <br /> <br />
-        <button class="button" type="submit">
-          SUBMIT
-        </button>{" "}
-        <br /> <br /> <br />
+        <button class="button " type="submit">
+          {result ? result : "SUBMIT"}
+        </button>
+        <br />
         <p class="psalms1">
           Thy Word is a Lamp unto my feet, and a Light unto my path.
         </p>
@@ -41,6 +71,6 @@ const About = () => {
       </form>
     </div>
   );
-}
+};
 
-export default About
+export default Anniversary;
