@@ -5,59 +5,32 @@ import "react-toastify/dist/ReactToastify.css";
 
 const PrayerRequestForm = () => {
   const [result, setResult] = useState("");
-
-  const onSubmit = async (event) => {
-    event.preventDefault();
-    setResult("SUBMITTING....");
-    const formData = new FormData(event.target);
-
-    // Get form values properly
-    const name = formData.get("name");
-    const email = formData.get("email");
-    const contact = formData.get("contact");
-    const message = formData.get("message");
-
-    try {
-      const response = await fetch(
-        "https://formsubmit.co/ajax/4de0fccfbf2809f17e5c0bc597596d4b",
-        {
+  
+      const onSubmit = async (event) => {
+        event.preventDefault();
+        setResult("SUBMITTING....");
+        const formData = new FormData(event.target);
+    
+        formData.append("access_key", "59475ece-6e80-4fa3-befc-34da8970f8ed");
+    
+        const response = await fetch("https://api.web3forms.com/submit", {
           method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Accept: "application/json",
-          },
-          body: JSON.stringify({
-            // Regular fields that will appear in the table
-            name: name,
-            email: email,
-            contact: contact,
-            message: message,
-
-            // FormSubmit specific parameters
-            _replyto: email,
-            _template: "table",
-            _subject: `Prayer Request Received: ${name}`,
-          }),
+          body: formData
+        });
+    
+        const data = await response.json();
+    
+        if (data.success) {
+          setResult("");
+          toast.success("Registration Details Submitted Successfully")
+          event.target.reset();
+        } else {
+          console.log("Error", data);
+          toast.error(data.message)
+          setResult("");
         }
-      );
-
-      const data = await response.json();
-
-      if (data.success) {
-        setResult("");
-        toast.success("Prayer Request Submitted Successfully");
-        event.target.reset();
-      } else {
-        console.log("Error", data);
-        toast.error(data.message || "Submission failed. Please try again.");
-        setResult("");
-      }
-    } catch (error) {
-      console.log("Error", error);
-      toast.error("An error occurred. Please try again.");
-      setResult("");
-    }
-  };
+      };
+  
 
   return (
     <div className="container">

@@ -11,52 +11,25 @@ const Anniversary = () => {
     setResult("SUBMITTING....");
     const formData = new FormData(event.target);
 
-    // Get form values properly
-    const name = formData.get("name");
-    const contact = formData.get("contact");
-    const email = formData.get("email");
+    formData.append("access_key", "97f78806-b2fb-454d-81a6-7561207e9d60");
 
-    try {
-      const response = await fetch(
-        "https://formsubmit.co/ajax/4de0fccfbf2809f17e5c0bc597596d4b",
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Accept: "application/json",
-          },
-          body: JSON.stringify({
-            // Regular fields that will appear in the table
-            name: name,
-            contact: contact,
-            email: email,
+    const response = await fetch("https://api.web3forms.com/submit", {
+      method: "POST",
+      body: formData,
+    });
 
-            // FormSubmit specific parameters
-            _replyto: email,
-            _template: "table",
-            _subject: `Anniversary Registration Received: ${name}`,
-          }),
-        }
-      );
+    const data = await response.json();
 
-      const data = await response.json();
-
-      if (data.success) {
-        setResult("");
-        toast.success("Registration Submitted Successfully");
-        event.target.reset();
-      } else {
-        console.log("Error", data);
-        toast.error(data.message || "Submission failed. Please try again.");
-        setResult("");
-      }
-    } catch (error) {
-      console.log("Error", error);
-      toast.error("An error occurred. Please try again.");
+    if (data.success) {
+      setResult("");
+      toast.success("Registration Details Submitted Successfully");
+      event.target.reset();
+    } else {
+      console.log("Error", data);
+      toast.error(data.message);
       setResult("");
     }
   };
-
   return (
     <div className="container2">
       <ToastContainer />

@@ -5,57 +5,32 @@ import "react-toastify/dist/ReactToastify.css";
 
 const Anniversary = () => {
   const [result, setResult] = useState("");
-
-  const onSubmit = async (event) => {
-    event.preventDefault();
-    setResult("SUBMITTING....");
-    const formData = new FormData(event.target);
-
-    // Get form values properly
-    const name = formData.get("name");
-    const contact = formData.get("contact");
-    const email = formData.get("email");
-
-    try {
-      const response = await fetch(
-        "https://formsubmit.co/ajax/4de0fccfbf2809f17e5c0bc597596d4b",
-        {
+  
+      const onSubmit = async (event) => {
+        event.preventDefault();
+        setResult("SUBMITTING....");
+        const formData = new FormData(event.target);
+    
+        formData.append("access_key", "a7840cc7-949f-4b84-8a87-7f5131703f74");
+    
+        const response = await fetch("https://api.web3forms.com/submit", {
           method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Accept: "application/json",
-          },
-          body: JSON.stringify({
-            // Regular fields that will appear in the table
-            name: name,
-            contact: contact,
-            email: email,
-
-            // FormSubmit specific parameters
-            _replyto: email,
-            _template: "table",
-            _subject: `Anniversary Registration Received: ${name}`,
-          }),
+          body: formData
+        });
+    
+        const data = await response.json();
+    
+        if (data.success) {
+          setResult("");
+          toast.success("Registration Details Submitted Successfully")
+          event.target.reset();
+        } else {
+          console.log("Error", data);
+          toast.error(data.message)
+          setResult("");
         }
-      );
-
-      const data = await response.json();
-
-      if (data.success) {
-        setResult("");
-        toast.success("Registration Submitted Successfully");
-        event.target.reset();
-      } else {
-        console.log("Error", data);
-        toast.error(data.message || "Submission failed. Please try again.");
-        setResult("");
-      }
-    } catch (error) {
-      console.log("Error", error);
-      toast.error("An error occurred. Please try again.");
-      setResult("");
-    }
-  };
+      };
+  
 
   return (
     <div className="container3">
